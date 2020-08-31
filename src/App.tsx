@@ -1,26 +1,25 @@
 import React from 'react';
 import logo from './logo.svg';
-import './App.css';
+// import './App.css';
+import styled from 'styled-components';
+import {Button} from '@material-ui/core';
+import {TableComponent} from './components/Table'
+import EnhancedTable from './components/TestTable'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+// export const header = styled(Button)`
+//   padding: 4em;
+//   background: black;
+// `;
+
+const App =  function() {
+  
+    return (
+      <div className="App">
+        <TableComponent/>
+        <EnhancedTable/> 
+      </div>  
+    )
 }
 
 export default App;
