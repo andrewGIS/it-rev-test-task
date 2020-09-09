@@ -7,6 +7,7 @@ import {TableComponent} from './components/Table'
 import EnhancedTable from './components/TestTable'
 
 
+
 // export const header = styled(Button)`
 //   padding: 4em;
 //   background: black;
@@ -17,7 +18,7 @@ const App =  function() {
     return (
       <div className="App">
         <TableComponent/>
-        <EnhancedTable/> 
+        {/* <EnhancedTable/>  */}
       </div>  
     )
 }

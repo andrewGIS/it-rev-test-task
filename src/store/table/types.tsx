@@ -1,14 +1,16 @@
-export const ADD_ROW = 'ADD_ROW'
+import { tblRow, order } from '../../commomTypes'
 
-export interface TableRow {
-    id: number,
-    date: string,
-    distance: number
-}
+export const ADD_ROW = 'ADD_ROW'
+export const GET_ROWS = 'GET_ROWS'
 
 interface AddRowAction {
     type: typeof ADD_ROW,
-    payload: TableRow
+    payload: tblRow
 }
 
-export type TableActionTypes = AddRowAction
+interface GetRowAction {
+    type: typeof GET_ROWS,
+    payload: tblRow[]
+}
+
+export type TableActionTypes = AddRowAction|GetRowAction

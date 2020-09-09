@@ -358,15 +358,15 @@ export default function EnhancedTable() {
                     </TableRow>
                   );
                 })}
-              {/* {emptyRows > 0 && (
+              {emptyRows > 0 && (
                 <TableRow style={{ height: (dense ? 33 : 53) * emptyRows }}>
                   <TableCell colSpan={6} />
                 </TableRow>
-              )} */}
+              )} 
             </TableBody>
           </Table>
         </TableContainer>
-        {/* <TablePagination
+      <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
           count={rows.length}
@@ -374,7 +374,7 @@ export default function EnhancedTable() {
           page={page}
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
-        /> */}
+        />
         <TableFooter>
           <Button>
             Prees

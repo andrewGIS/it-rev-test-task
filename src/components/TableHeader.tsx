@@ -3,8 +3,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
-import { tblRow,order } from '../commomTypes'
-import { createStyles, makeStyles } from '@material-ui/core';
+import { tblRow,order } from '../commomTypes';
 
 interface headCell {
     id: keyof tblRow;
@@ -20,7 +19,9 @@ const headCells: headCell[] = [
 ];
 
 interface TableHeaderProps {
-    onRequestSort: (event: React.MouseEvent<unknown>, property: keyof tblRow, dir:order) => void;
+    onRequestSort: (event: React.MouseEvent<unknown>, 
+        property: keyof tblRow, 
+        dir:order) => void;
 }
 
 const TableHeader = (props:TableHeaderProps) => {
