@@ -10,6 +10,7 @@ import { createStyles, withStyles, makeStyles, Theme } from '@material-ui/core/s
 
 import { TableComponent } from './components/Table'
 import {Graphic} from './components/Graphic'
+import {MyMap} from './components/Map'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -41,6 +42,15 @@ const App = function () {
             <Grid item key={1} >
 
               <Graphic/>
+
+            </Grid>
+            <Grid item key={2} >
+              <Paper style={{height:'350px',width:'250px'}}>
+                
+
+                <MyMap/>
+
+                </Paper>
 
             </Grid>
           </Grid>
