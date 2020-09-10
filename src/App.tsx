@@ -4,7 +4,6 @@ import logo from './logo.svg';
 import styled from 'styled-components';
 import { Button, Container, Box } from '@material-ui/core';
 
-import EnhancedTable from './components/TestTable'
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { createStyles, withStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -23,10 +22,10 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-// export const header = styled(Button)`
-//   padding: 4em;
-//   background: black;
-// `;
+export const header = styled(Button)`
+  padding: 4em;
+  background: black;
+`;
 
 const App = function () {
 
@@ -42,7 +41,7 @@ const App = function () {
             <Grid item key={1} >
 
               <Graphic/>
-              
+
             </Grid>
           </Grid>
         </Grid>
