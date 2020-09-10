@@ -8,20 +8,21 @@ import { createStyles, withStyles, makeStyles, Theme } from '@material-ui/core/s
 import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Grid from '@material-ui/core/Grid';
-import {TableHeader} from '../components/TableHeader'
-import {tblRow, order} from '../commomTypes'
+import { TableHeader } from '../components/TableHeader'
+import { Container } from '@material-ui/core'
+import { tblRow, order } from '../commomTypes'
 // test redux
-import {useSelector, useDispatch} from 'react-redux'
-import {TableState} from '../store/table/reducer'
+import { useSelector, useDispatch } from 'react-redux'
+import { TableState } from '../store/table/reducer'
 
-import {AddRowDialog} from './Dialog'
+import { AddEditRowDialog } from './Dialog'
 
 import { IconButton } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 
-import {getRows} from '../store/table/actions'
-import { METHODS } from 'http';
+import { fetchRows } from '../store/table/actions'
 
+import { Graphic } from './Graphic'
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -30,12 +31,12 @@ const useStyles = makeStyles((theme: Theme) =>
             margin: theme.spacing(1),
         },
         table: {
-            //height: "400px"
+            maxHeight: 350,
             // maxWidth: 700,
+            //overflowY: 'scroll',
         },
-        paper: {
-            //width: 140,
-            //height: 400
+        paper:{
+            overflow:'auto'
         },
         margin: {
             margin: theme.spacing(1)
@@ -43,11 +44,6 @@ const useStyles = makeStyles((theme: Theme) =>
         footer: {
             backgroundColor: 'black'
         },
-        // container: {
-        //     height: 50,
-        //     alignContent:'center',
-        //     verticalAlign:'baseline'
-        // }
     })
 );
 
@@ -70,37 +66,47 @@ const getDayOfWeek = (inDate: Date): string => {
 
 const formatDistance = (dist: number): string => {
     let kms: number = Math.floor(dist / 1000)
-    let kmsLabel: string = kms % 10 == 1 ? 'километр' : kms <= 4 ? 'километра' : 'километров'
     let meters: number = dist % 1000
-    let metersLabel: string = dist % 10 == 1 ? 'метр' : meters <= 4 && meters != 0 ? 'метра' : 'метров'
-    return kms == 0 ? `${meters} ${metersLabel}`
-        : meters == 0 ? `${kms} ${kmsLabel}`
+
+    let kmsLabel: string = kms % 10 === 1
+        ? 'километр'
+        : kms % 10 <= 4
+            ? 'километра'
+            : 'километров'
+
+    let metersLabel: string = meters % 10 === 1
+        ? 'метр' : meters <= 4 && meters != 0
+            ? 'метра' : 'метров'
+
+    return kms === 0
+        ? `${meters} ${metersLabel}`
+        : meters === 0
+            ? `${kms} ${kmsLabel}`
             : `${kms} ${kmsLabel} ${meters} ${metersLabel}`
 }
 
-function compare (a:string,b:string):number
-function compare (a:number,b:number):number
-function compare (a:string|number,b:string|number):number
-//function compare (a:any,b:any):number
+function compare(a: string, b: string): number
+function compare(a: number, b: number): number
+function compare(a: string | number, b: string | number): number
 function compare(a: any, b: any): number {
     if (typeof a == 'number') {
-      if (a < b) {
-        return -1
-      }
-      if (a > b) {
-        return 1
-      }
+        if (a < b) {
+            return -1
+        }
+        if (a > b) {
+            return 1
+        }
     }
     if (typeof a == 'string') {
-      if (parseDate(a) < parseDate(b)) {
-        return -1
-      }
-      if (parseDate(a) > parseDate(b)) {
-        return 1
-      }
+        if (parseDate(a) < parseDate(b)) {
+            return -1
+        }
+        if (parseDate(a) > parseDate(b)) {
+            return 1
+        }
     }
     return 0
-  }
+}
 
 const StyledTableRow = withStyles((theme: Theme) =>
     createStyles({
@@ -117,127 +123,119 @@ const StyledTableRow = withStyles((theme: Theme) =>
 
 //const connector = connect()
 
-const TableComponent=() => {
+const TableComponent = () => {
 
-    const dispatch = useDispatch()
+
     //dispatch(getRows())
-
+    const dispatch = useDispatch();
     const classes = useStyles();
 
     const [isDialogOpen, setDialogVisibility] = React.useState(false)
-    const [editRowData, seteditRowData] = React.useState<tblRow|undefined>(undefined)
+    const [editRowData, setEditRowData] = React.useState<tblRow | undefined>(undefined)
+    const [orderDir, setOrderDir] = React.useState<order>('asc')
+    const [orderBy, setOrderBy] = React.useState<keyof tblRow>('date')
 
-    const rows1 = useSelector((state:TableState) => state.tableRows)
-    const [sortedRows, updateRow] = React.useState<tblRow[]>(rows1);
+    const tblData = useSelector((state: TableState) => state.tableRows)
 
-    useEffect(()=>{
+
+    useEffect(() => {
         // load init rows
-        dispatch(getRows())
+
+        dispatch(fetchRows())
         //updateRow(rows1)
-    },[])
 
- 
+    }, [])
 
-    const handleSort = (event: React.MouseEvent<unknown>, property: keyof tblRow, dir:order) => {
-
-        console.log(property,dir)
-
-        let sortedRows = [...rows1.sort((a,b)=>{
+    const sorting = (data: tblRow[], property: keyof tblRow, dir: order): tblRow[] => {
+        let sortedRows = [...tblData.sort((a, b) => {
             if (dir === 'asc') {
-                return compare(a[property], b[property])
-            }
-            else {
                 return -compare(a[property], b[property])
             }
-            
-        })]
-        updateRow (sortedRows)
-        //setOrder(isAsc ? 'desc' : 'asc');
-        //setOrderBy(property);
-      };
+            else {
+                return compare(a[property], b[property])
+            }
 
-    const handleDeleteRow = (e:number) => {
-        console.log(e)
-        fetch (`http://localhost:5000/walking/${e}`,
-        {method:'DELETE'})
-        dispatch(getRows())
-        
+        })]
+
+        return sortedRows
     }
 
-    const handleEditRow = (row:tblRow) => {
+    const onOrderOptChange = (event: React.MouseEvent<unknown>, property: keyof tblRow, dir: order) => {
+
+        const isAsc = orderBy === property && orderDir === 'asc';
+
+        setOrderDir(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
+    };
+
+    const handleDeleteRow = async (e: number) => {
+        await fetch(`http://localhost:5000/walking/${e}`,
+            { method: 'DELETE' })
+        dispatch(fetchRows())
+
+    }
+
+    const handleEditRow = (row: tblRow) => {
         console.log(row)
-        seteditRowData(row)
+        setEditRowData(row)
         setDialogVisibility(true)
         // return ( <AddRowDialog />)
     }
-    const toggleDialog = (payload:boolean) => {
-        seteditRowData(undefined)
+    const toggleDialog = (payload: boolean) => {
+        setEditRowData(undefined)
         setDialogVisibility(payload)
     }
 
     return (
-        <Grid container className={classes.root} >
-            <Grid container justify="center" spacing={2}>
-                <Grid item key={0}>
-                    <Paper className={classes.paper}>
+        <Container fixed >
+                <Table
+                    className={classes.table}
+                // size="small"
+                >
+                    <TableHeader
+                        onRequestSort={onOrderOptChange}
+                        orderDir={orderDir}
+                        orderBy={orderBy}
+                    >
+                    </TableHeader>
 
-                        <Table
-                            className={classes.table}
-                        // size="small"
-                        >
-                            <TableHeader onRequestSort={handleSort}></TableHeader>
+                    <TableBody>
+                        {sorting(tblData, orderBy, orderDir).map((row, index) => (
+                            <StyledTableRow key={index}>
 
-                            <TableBody>
-                                {rows1.map((row,index) => (
-                                    <StyledTableRow key={index}>
+                                <TableCell >
+                                    {getDayOfWeek(parseDate(row.date))}
+                                    <br />
+                                    {parseDate(row.date).toLocaleDateString()}
+                                </TableCell>
 
-                                        <TableCell >
-                                            {getDayOfWeek(parseDate(row.date))}
-                                            <br />
-                                            {parseDate(row.date).toLocaleDateString()}
-                                        </TableCell>
+                                <TableCell align="right">
+                                    {formatDistance(row.distance)}
+                                </TableCell>
+                                <TableCell>
+                                    <IconButton size="small" onClick={() => handleDeleteRow(row.id)}>
+                                        <DeleteIcon ></DeleteIcon>
+                                    </IconButton>
 
-                                        <TableCell align="right">
-                                            {formatDistance(row.distance)}
-                                            <IconButton size="small" onClick={()=>handleDeleteRow(row.id)}>
-                                                <DeleteIcon ></DeleteIcon>
-                                            </IconButton>
-                                            <IconButton size="small" onClick={()=>handleEditRow(row)}>
-                                                <EditIcon ></EditIcon>
-                                            </IconButton>
-                                        </TableCell>
-                                        <TableCell>
-                                            
+                                    <IconButton size="small" onClick={() => handleEditRow(row)}>
+                                        <EditIcon ></EditIcon>
+                                    </IconButton>
+                                </TableCell>
 
-                                        </TableCell>
-                                    </StyledTableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-
-                        
-                        
-
-                    </Paper>
-                    <AddRowDialog 
-                    key={0} 
-                    isOpen={isDialogOpen} 
+                            </StyledTableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+                <AddEditRowDialog
+                    isOpen={isDialogOpen}
                     handleShowDialog={toggleDialog}
-                    inputData = {editRowData}
-                    />
-                </Grid>
-                <Grid item key={1}>
-                    <Paper className={classes.paper}>
-                        <Typography>
-                            Суммарная активность
-                        </Typography>
-                    </Paper>
-                </Grid>
-            </Grid>
-        </Grid>
+                    editData={editRowData}
+                />
+        </Container >
+
     )
 }
 
 
 //export { formatDistance,  connect(TableComponent1)
-export { formatDistance,  TableComponent}
+export { formatDistance, TableComponent }

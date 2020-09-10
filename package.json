@@ -14,7 +14,9 @@
     "@types/react-dom": "^16.9.8",
     "@types/react-redux": "^7.1.9",
     "@types/redux": "^3.6.0",
+    "chart.js": "^2.9.3",
     "react": "^16.13.1",
+    "react-chartjs-2": "^2.10.0",
     "react-dom": "^16.13.1",
     "react-redux": "^7.2.1",
     "react-scripts": "3.4.3",
@@ -46,6 +48,7 @@
     ]
   },
   "devDependencies": {
+    "@types/chart.js": "^2.9.24",
     "@types/styled-components": "^5.1.2"
   }
 }

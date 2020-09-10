@@ -4,180 +4,185 @@ import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { Typography, Container } from '@material-ui/core';
-
+import { Container } from '@material-ui/core';
 import { useEffect } from 'react'
-
-import { createStyles, lighten, makeStyles, Theme } from '@material-ui/core/styles';
-
+import { createStyles, makeStyles, Theme, responsiveFontSizes } from '@material-ui/core/styles';
 import { useDispatch } from 'react-redux'
-
-import { sendMessage, getRows } from '../store/table/actions'
-
+import { fetchRows } from '../store/table/actions'
 import { tblRow } from '../commomTypes'
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
     createStyles({
         container: {
             height: 50,
             display: 'flex',
-            backgroundColor: 'black',
-            textTransform: 'none'
-
+            backgroundColor: 'red',
+            //textTransform: 'none'
         },
         button: {
-            color: 'red',
-            textTransform: 'none'
+            outline: 0,
+            backgroundColor: 'red',
+            color: 'white',
+            textTransform: 'none',
+            cursor: 'pointer',
+            width: '100%',
+            position: "relative",
+            borderColor: 'red',
+            fontFamily: 'Roboto',
+            fontSize: 16,
+            border: 0
+
         }
     }))
 
 interface DialogProps {
-    inputData?: tblRow,
+    editData?: tblRow,
     isOpen: boolean,
     handleShowDialog: (visible: boolean) => void;
 }
 
-export const AddRowDialog: React.FC<DialogProps> = (
+export const AddEditRowDialog: React.FC<DialogProps> = (
     {
-        inputData,
+        editData,
         isOpen,
         handleShowDialog
     }
 ) => {
-
-    const [open, setOpen] = React.useState(isOpen);
-    const [inputID, changeInputID] = React.useState<number | null>(null);
-    const [inputDate, changeInputDate] = React.useState<string | null>(null);
-    const [inputDistance, changeInputDistance] = React.useState<number | null>(null);
-    const [errorInForm, setErrorForm] = React.useState<boolean>(false);
+    const [inputID, setInputID] = React.useState<number | null>();
+    const [inputDate, setInputDate] = React.useState<string | null>();
+    const [inputDistance, setInputDistance] = React.useState<number | null>();
 
     const dispatch = useDispatch()
-
-    //React.useEffect(() => { console.log("component updated"); });
+    const classes = useStyles();
 
     const parseDateToDisplay = (inString: string): string => {
-        let t = new Date(inString)
-        return t.toJSON().slice(0, 16)
+        let date = new Date(inString)
+        return date.toJSON().slice(0, 16)
     }
 
-    React.useEffect(() => {
-        if (inputData) {
-            changeInputID(inputData.id)
-            changeInputDate(parseDateToDisplay(inputData.date))
-            changeInputDistance(inputData.distance)
+    useEffect(() => {
+        if (editData) {
+            setInputID(editData.id)
+            setInputDate(parseDateToDisplay(editData.date))
+            setInputDistance(editData.distance)
         } else {
-            changeInputID(null)
-            changeInputDate(null)
-            changeInputDistance(null)
+            clearFields()
         }
-    }, [inputData])
+    }, [editData])
 
-    const onAddRow = () => {
+    const onAddRow = async () => {
 
-        if (inputData) {
+        if (editData) {
 
             // put request
-            fetch(`http://localhost:5000/walking/${inputData.id}`, {
-                method: 'PUT',
-                body: JSON.stringify({ "id": inputData.id, "date": inputDate, "distance": inputDistance }),
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            })
-            dispatch(getRows())
-        } else {
-
-            // postt request
-            fetch(`http://localhost:5000/walking`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    "id": inputID ? inputID : 0,
-                    "date": inputDate ? new Date(inputDate).toISOString() : "0",
-                    "distance": inputDistance ? inputDistance : 1000
+            try {
+                const response = await fetch(`http://localhost:5000/walking/${editData.id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ "id": editData.id, "date": inputDate, "distance": inputDistance }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                 })
-            })
-            dispatch(getRows())
+
+                if (!response.ok)
+                {
+                    throw new Error(response.statusText);
+                }
+                dispatch(fetchRows())
+
+                handleShowDialog(false)
+                clearFields()
+
+            } catch (err) {
+                alert(err)
+            }
+
+
+
+        } else {
+            // post request
+            try {
+                const response = await fetch(`http://localhost:5000/walking`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "id": inputID,
+                        "date": inputDate,
+                        "distance": inputDistance
+                    })
+                })
+
+                if (!response.ok) {
+                    throw new Error(response.statusText);
+                }
+
+                dispatch(fetchRows())
+                handleShowDialog(false)
+                clearFields()
+
+            } catch (err) {
+                alert(err)
+            }
         }
-
-        setOpen(false);
-        // dispatch(sendMessage({
-        //     id: inputID ? inputID : 0,
-        //     date: inputDate ? new Date(inputDate).toISOString() : "0",
-        //     distance: inputDistance ? inputDistance : 1000
-        // }))
-
-        handleShowDialog(false)
-
-        clearField()
-
     }
 
     const handleClose = () => {
 
-        //console.log(inputData)
-        setOpen(false);
-        clearField()
+        handleShowDialog(false)
+        clearFields()
     };
 
-    const clearField = () => {
-        changeInputDistance(null)
-        changeInputDate(null)
-        changeInputID(null)
+    const clearFields = () => {
+        setInputDistance(null)
+        setInputDate(null)
+        setInputID(null)
     }
-
-
-
-    const classes = useStyles();
 
     return (
         <Container className={classes.container}>
-            <Button
-                variant="text"
-                color="primary"
-                fullWidth
-                className={classes.button} onClick={() => handleShowDialog(true)}>
+            <button
+                className={classes.button}
+                onClick={() => handleShowDialog(true)}>
                 Добавить запись
-            </Button>
-            <Dialog open={isOpen} onClose={handleClose} aria-labelledby="form-dialog-title">
+            </button>
+            <Dialog open={isOpen} onClose={handleClose} >
                 <DialogTitle>
-                    { inputData
-                    ? "Редактирование данных"
-                    :"Внесите данные (заполните все поля)"
+                    {editData
+                        ? "Редактирование данных"
+                        : "Внесите данные (заполните все поля)"
                     }
                 </DialogTitle>
                 <DialogContent>
-                    <TextField onChange={(event) => changeInputID(parseInt(event.target.value))}
+                    <TextField onChange={(event) => setInputID(parseInt(event.target.value))}
                         error={inputID ? false : true}
                         autoFocus
                         margin="dense"
                         id="name"
-                        label="Id"
+                        label="Идентификатор записи"
                         type="number"
                         fullWidth
-                        disabled={inputData ? true : false}
-                        value={inputData ? inputData.id : undefined}
+                        disabled={editData ? true : false}
+                        value={inputID}
                     />
-                    <TextField onChange={(event) => changeInputDate(event.target.value)}
+                    <TextField onChange={(event) => setInputDate(event.target.value)}
                         error={inputDate ? false : true}
                         margin="dense"
                         id="time"
                         type="datetime-local"
                         fullWidth
-                        value={inputDate ? inputDate : undefined}
+                        value={inputDate}
                     />
-                    <TextField onChange={(event) => changeInputDistance(parseInt(event.target.value))}
+                    <TextField onChange={(event) => setInputDistance(parseInt(event.target.value))}
                         error={inputDistance ? false : true}
                         margin="dense"
                         id="distance"
                         label="Дистанция"
                         type="number"
                         fullWidth
-                        value={inputDistance ? inputDistance : undefined}
+                        value={inputDistance}
                     />
                 </DialogContent>
 
@@ -189,9 +194,9 @@ export const AddRowDialog: React.FC<DialogProps> = (
                         disabled={!inputID || !inputDate || !inputDistance}
                         onClick={onAddRow}
                         color="primary">
-                        {inputData 
-                        ? "Cохранить запись" 
-                        : "Добавить запись"}
+                        {editData
+                            ? "Cохранить запись"
+                            : "Добавить запись"}
                     </Button>
                 </DialogActions>
             </Dialog>

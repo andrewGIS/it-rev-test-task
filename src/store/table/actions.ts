@@ -1,22 +1,14 @@
-import {TableActionTypes,ADD_ROW,GET_ROWS } from './types'
+import {TableActionTypes,SET_ROWS } from './types'
 import {tblRow} from '../../commomTypes'
-import { ThunkAction } from 'redux-thunk'
-
-import {TableState} from './reducer'
+import {ThunkAction } from 'redux-thunk'
 import {Action} from 'redux'
-import { useDispatch } from 'react-redux'
+import {TableState} from './reducer'
 
 // TypeScript infers that this function is returning SendMessageAction
-export function sendMessage(newRow: tblRow): TableActionTypes {
-  return {
-    type: ADD_ROW,
-    payload: newRow
-  }
-}
 
-export function getRow(newRows: tblRow[]): TableActionTypes {
+export function setRows(newRows: tblRow[]): TableActionTypes {
   return {
-    type: GET_ROWS,
+    type: SET_ROWS,
     payload: newRows
   }
 }
@@ -24,14 +16,14 @@ export function getRow(newRows: tblRow[]): TableActionTypes {
 //const dispatch = useDispatch()
 
 // https://redux.js.org/recipes/usage-with-typescript#overview
-export const getRows = (): ThunkAction<void, TableState, unknown, Action<string>> => async dispatch =>{
+export const fetchRows = (): ThunkAction<void, TableState, unknown, Action<string>> => async dispatch =>{
   
-  const asyncResp = await fetchRows<tblRow>()
-  dispatch(getRow(asyncResp))
+  const asyncResp = await requestData<tblRow>()
+  dispatch(setRows(asyncResp))
 
 }
 
-function fetchRows<T>():Promise<T[]> {
+function requestData<T>():Promise<T[]> {
   return fetch("http://localhost:5000/walking")
     .then(response => response.json() as Promise<T[]>)
 }

@@ -3,7 +3,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
-import { tblRow,order } from '../commomTypes';
+import { tblRow, order } from '../commomTypes';
 
 interface headCell {
     id: keyof tblRow;
@@ -19,28 +19,22 @@ const headCells: headCell[] = [
 ];
 
 interface TableHeaderProps {
+    orderDir: order,
+    orderBy: keyof tblRow,
     onRequestSort: (event: React.MouseEvent<unknown>, 
-        property: keyof tblRow, 
-        dir:order) => void;
+         property: keyof tblRow, 
+         dir:order) => void;
 }
 
-const TableHeader = (props:TableHeaderProps) => {
+const TableHeader: React.FC<TableHeaderProps> = (
 
-    const [sortDir,updateSortDir] = React.useState<order>('asc')
-    const [sortCol,updateSortCol] = React.useState<keyof tblRow>('date')
+    { orderDir, orderBy,onRequestSort }) => {
 
-    const { onRequestSort } = props;
+    const createSortHandler = (property: keyof tblRow, dir: order) => (event: React.MouseEvent<unknown>) => {
 
-    const createSortHandler = (property: keyof tblRow, dir:order) => (event: React.MouseEvent<unknown>) => {
-
-        const isAsc = sortCol === property && sortDir === 'asc';
-        
-        updateSortDir(isAsc ? 'desc' : 'asc')
-        updateSortCol(property)
         onRequestSort(event, property,dir);
-        
-      };
-    
+
+    };
 
     return (
         <TableHead>
@@ -51,9 +45,9 @@ const TableHeader = (props:TableHeaderProps) => {
                         align={headCell.align === "left" ? "left" : "right"}
                     >
                         <TableSortLabel
-                            active={headCell.id === sortCol}
-                            direction={sortDir}
-                            onClick={createSortHandler(headCell.id,sortDir)}
+                            active={headCell.id === orderBy}
+                            direction={orderDir}
+                            onClick={createSortHandler(headCell.id,orderDir)}
                         >
                             {headCell.label}
                         </TableSortLabel>

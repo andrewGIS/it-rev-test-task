@@ -1,16 +1,10 @@
-import { tblRow, order } from '../../commomTypes'
+import { tblRow } from '../../commomTypes'
 
-export const ADD_ROW = 'ADD_ROW'
-export const GET_ROWS = 'GET_ROWS'
+export const SET_ROWS = 'SET_ROWS'
 
-interface AddRowAction {
-    type: typeof ADD_ROW,
-    payload: tblRow
-}
-
-interface GetRowAction {
-    type: typeof GET_ROWS,
+interface SetRowsAction {
+    type: typeof SET_ROWS,
     payload: tblRow[]
 }
 
-export type TableActionTypes = AddRowAction|GetRowAction
+export type TableActionTypes = SetRowsAction
