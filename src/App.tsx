@@ -17,10 +17,6 @@ const useStyles = makeStyles((theme: Theme) =>
     root: {
       margin: theme.spacing(1),
     },
-    paper: {
-      maxWidth: 450,
-      height: 350
-    },
     margin: {
       margin: theme.spacing(1)
     }
@@ -39,17 +35,14 @@ const App = function () {
       <Grid container className={classes.root} >
         <Grid container justify="center" spacing={2}>
           <Grid item key={0} >
-            <Container fixed style={{maxWidth:'400px',maxHeight:'400px'}}>
             
               <TableComponent/>
               
-              </Container>
             </Grid>
             <Grid item key={1} >
-            <Container fixed style={{minWidth:'600px',minHeight:'400px'}}>
 
               <Graphic/>
-              </Container>
+              
             </Grid>
           </Grid>
         </Grid>

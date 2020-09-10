@@ -30,20 +30,14 @@ const useStyles = makeStyles((theme: Theme) =>
         root: {
             margin: theme.spacing(1),
         },
-        table: {
-            maxHeight: 350,
-            // maxWidth: 700,
-            //overflowY: 'scroll',
-        },
-        paper:{
-            overflow:'auto'
-        },
         margin: {
             margin: theme.spacing(1)
         },
-        footer: {
-            backgroundColor: 'black'
-        },
+        paper:{
+            overflowY:'auto',
+            maxHeight:350,
+            maxWidth:400
+        }
     })
 );
 
@@ -187,11 +181,8 @@ const TableComponent = () => {
     }
 
     return (
-        <Container fixed >
-                <Table
-                    className={classes.table}
-                // size="small"
-                >
+       <Paper className={classes.paper}>
+                <Table>
                     <TableHeader
                         onRequestSort={onOrderOptChange}
                         orderDir={orderDir}
@@ -231,7 +222,7 @@ const TableComponent = () => {
                     handleShowDialog={toggleDialog}
                     editData={editRowData}
                 />
-        </Container >
+       </Paper>
 
     )
 }

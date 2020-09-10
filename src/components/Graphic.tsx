@@ -5,6 +5,7 @@ import { ChartOptions } from 'chart.js'
 import { useSelector } from 'react-redux';
 import { TableState } from '../store/table/reducer';
 import Paper from '@material-ui/core/Paper';
+import { Container } from '@material-ui/core';
 
 export const Graphic: React.FC = () => {
 
@@ -68,19 +69,8 @@ export const Graphic: React.FC = () => {
     }, [tblData])
 
     return (
-        <div style={{position:'relative', height:'100%'}}>
-            <Line data={barData} options={barOptions}></Line>
-            <div style={{ 
-                height: '50px', 
-                backgroundColor: 'black',
-                color:'white' ,
-                display:'flex',
-                verticalAlign:'middle'
-                }}>
-                Максимум: {Math.max(...tblData.map(row => row.distance))} метров Минимум: {Math.min(...tblData.map(row => row.distance))} метров
-            </div>
-        </div>
-
-
+        <Paper style={{minWidth:'550px', minHeight:'350px'}}>
+            <Line data={barData} options={barOptions} ></Line>
+        </Paper>
     )
 }
